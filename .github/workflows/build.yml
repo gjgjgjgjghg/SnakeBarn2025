@@ -1,0 +1,37 @@
+name: Build Godot Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: 4.2.1
+        export-templates: 
+
+    - name: Create export_presets.cfg
+      run: |
+        echo "[preset.0]" > export_presets.cfg
+        echo "name=\"Android\"" >> export_presets.cfg
+        echo "platform=\"Android\"" >> export_presets.cfg
+        echo "runnable=true" >> export_presets.cfg
+        echo "custom_package/debug=\"build.apk\"" >> export_presets.cfg
+
+    - name: Build APK
+      run: godot --headless --export-release "Android" build.apk
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: snakebarn2025-apk
+        path: build.apk
